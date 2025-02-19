@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
-#include <thread>
-#include <mutex>
-
 #include "GLFW/glfw3.h"
 #include "GL/freeglut.h"
 #include "../include/objreader.h"
