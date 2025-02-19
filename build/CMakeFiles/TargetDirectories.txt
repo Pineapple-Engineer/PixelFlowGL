@@ -1,0 +1,3 @@
+/home/zahel/Dev/Projects/PixelFlowGL/build/CMakeFiles/PixelFlowGL.dir
+/home/zahel/Dev/Projects/PixelFlowGL/build/CMakeFiles/edit_cache.dir
+/home/zahel/Dev/Projects/PixelFlowGL/build/CMakeFiles/rebuild_cache.dir

@@ -20,7 +20,7 @@ void getFace(std::list<Face>& faces, std::stringstream& ss) {
 }
 
 bool readObj(std::list<Model>& models) {
-    std::ifstream file("models/Man_Mesh.obj", std::ios::in);
+    std::ifstream file("../models/Man_Mesh.obj", std::ios::in);
     if(file.fail()) {
         std::cout << "[ERROR] Couldn't open the file\n";
         return false;

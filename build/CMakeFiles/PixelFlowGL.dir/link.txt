@@ -1,0 +1,1 @@
+/sbin/c++ -Wl,--dependency-file=CMakeFiles/PixelFlowGL.dir/link.d CMakeFiles/PixelFlowGL.dir/src/main.cpp.o CMakeFiles/PixelFlowGL.dir/src/objreader.cpp.o -o PixelFlowGL  /usr/lib/libGL.so /usr/lib/libglfw.so.3.4 /usr/lib/libglut.so /usr/lib/libGLU.so /usr/lib/libXmu.so /usr/lib/libXi.so
