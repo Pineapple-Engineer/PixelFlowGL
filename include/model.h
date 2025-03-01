@@ -10,9 +10,8 @@ class Model {
 public:
     std::vector<Vertex> vertices;
     std::list<Face> faces;
-    Vertex c;
 
-    Model(): c(0.0f, 0.0f, 0.0f) {}
+    Model() = default;
 };
 
 #endif

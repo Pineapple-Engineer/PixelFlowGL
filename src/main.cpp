@@ -114,16 +114,15 @@ void Display() {
     glBegin(GL_TRIANGLES); // Define vertices for shapes
 
     Model& sphere1 = models.front();
-    sphere1.c.x = 3;
 
     glColor3f(1.0f, 0.55f, 0.20f); // Color for the first sphere
     for (Face& f : sphere1.faces) {
         Vertex& v1 = sphere1.vertices[f.index1];
         Vertex& v2 = sphere1.vertices[f.index2];
         Vertex& v3 = sphere1.vertices[f.index3];
-        glVertex3f(sphere1.c.x + v1.x + 0.7f, v1.y, v1.z);
-        glVertex3f(sphere1.c.x + v2.x + 0.7f, v2.y, v2.z);
-        glVertex3f(sphere1.c.x + v3.x + 0.7f, v3.y, v3.z);
+        glVertex3f(v1.x + 3.7f, v1.y, v1.z);
+        glVertex3f(v2.x + 3.7f, v2.y, v2.z);
+        glVertex3f(v3.x + 3.7f, v3.y, v3.z);
     }
 
     Model& sphere2 = models.back();
@@ -133,20 +132,14 @@ void Display() {
     float x = r * std::cos(theta);
     float y = r * std::sin(theta);
 
-    sphere2.c.x = x;
-    sphere2.c.y = y;
-
     glColor3f(0.45f, 0.86f, 1.0f); // Color for the second sphere
     for (Face& f : sphere2.faces) {
         Vertex& v1 = sphere2.vertices[f.index1];
         Vertex& v2 = sphere2.vertices[f.index2];
         Vertex& v3 = sphere2.vertices[f.index3];
-
-        float xOffset = sphere1.c.x + sphere2.c.x;
-        float yOffset = sphere2.c.y;
-        glVertex3f(v1.x + xOffset, v1.y + yOffset, v1.z);
-        glVertex3f(v2.x + xOffset, v2.y + yOffset, v2.z);
-        glVertex3f(v3.x + xOffset, v3.y + yOffset, v3.z);
+        glVertex3f(v1.x + 3 + x, v1.y + y, v1.z);
+        glVertex3f(v2.x + 3 + x, v2.y + y, v2.z);
+        glVertex3f(v3.x + 3 + x, v3.y + y, v3.z);
     }
 
     theta += 0.007f;
