@@ -10,7 +10,9 @@ class Model {
 public:
     std::vector<Vertex> vertices;
     std::list<Face> faces;
-    double c;
+    Vertex c;
+
+    Model(): c(0.0f, 0.0f, 0.0f) {}
 };
 
 #endif

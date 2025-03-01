@@ -1,16 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <ctime>
 #include "GLFW/glfw3.h"
 #include "GL/freeglut.h"
 #include "../include/objreader.h"
+using std::cout, std::cerr;
 
-const float WIDTH{800.0f};
-const float HEIGHT{600.0f};
+constexpr float WIDTH{1080.0f};
+constexpr float HEIGHT{720.0f};
 
 int InitWindow();
 void InitOpenGL();
 void Display();
+void renderText(const std::string& msg, float x, float y);
 
 GLFWwindow* window;
 
@@ -20,34 +23,36 @@ int main() {
 	if (InitWindow() < 0) return -1;
 
     // Read the .obj file
-    if (!readObj(models)) {
-        std::cerr << "[ERROR] Failed to read the models\n";
+    if (!objr::readObj(models)) {
+        cerr << "[ERROR] Failed to read the models\n";
         glfwTerminate();
         return -1;
     }
 
     clock_t initialTime, finalTime;
-    double timeElapsed;
+    double timeElapsed{0.0};
+    std::string msg;
     int fps{};
-	do { // Main Loop
-        if(fps == 0) initialTime = clock();
+	do {
+        if(fps == 0) 
+			initialTime = clock();
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen
 		
-        // Draws the scene
         Display();
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-        
+		// Displays on the window current fps
         ++fps;
         finalTime = clock() - initialTime;
         timeElapsed += (static_cast<double>(finalTime) / CLOCKS_PER_SEC);
-        if(timeElapsed > 1) {
-            std::cout << "FPS: " << fps << "\n";
+        if(timeElapsed >= 1) {
+            msg = "FPS: " + std::to_string(fps);
             fps = 0;
             timeElapsed = 0;
         }
+        renderText(msg, -0.9f, 0.9f);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
 
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
 
@@ -57,15 +62,18 @@ int main() {
 }
 
 int InitWindow(void) {
-	if (!glfwInit()) {
-        std::cerr << "[ERROR] Failed to initialize GLFW\n";
+	if(!glfwInit()) {
+        cerr << "[ERROR] Failed to initialize GLFW\n";
         getchar();
         return -1;
 	}
 
+	int argc = 0;
+	glutInit(&argc, nullptr);
+
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Test", nullptr, nullptr);
     if(window == nullptr) {
-        std::cerr << "[ERROR] Failed to open GLFW window\n";
+        cerr << "[ERROR] Failed to open GLFW window\n";
         getchar();
         glfwTerminate();
         return -1;
@@ -90,36 +98,82 @@ void InitOpenGL() {
 
     glMatrixMode(GL_MODELVIEW);                       // Model & View Matrix
     glLoadIdentity();
-    // gluLookAt(eyex, eyey, eyez, centerx, centery, centerz, upx, upy, upz)
-    gluLookAt(0.0f, 0.0f, 10.0f,   0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f); // Camera control
+    gluLookAt(0.0f, 0.0f, 20.0f,   0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f);
 
     glEnable(GL_DEPTH_TEST);                          //! Provides depth to the drawing
 }
 
-float xCamView{0.0f};
-float yCamView{0.0f};
-const float zCamView{10.0f};
+float theta{};
+constexpr float e{7.0f/17.0f};
+constexpr float a{8.5f};
 void Display() {
-    glColor3f(0.1f, 0.2f, 0.3f); // Color Setter
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(xCamView, yCamView, zCamView,   0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f);
+    gluLookAt(0.0f, 0.0f, 20.0f,   0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f);
 
-    glBegin(GL_TRIANGLES);
-    for(Model& m_it : models) {
-        for(Face& c_it : m_it.faces) {
-            Vertex& v1 = m_it.vertices[c_it.idx1];
-            Vertex& v2 = m_it.vertices[c_it.idx2];
-            Vertex& v3 = m_it.vertices[c_it.idx3];
+    glBegin(GL_TRIANGLES); // Define vertices for shapes
 
-            glVertex3f(v1.x, v1.y, v1.z);
-            glVertex3f(v2.x, v2.y, v2.z);
-            glVertex3f(v3.x, v3.y, v3.z);
-        }
+    Model& sphere1 = models.front();
+    sphere1.c.x = 3;
+
+    glColor3f(1.0f, 0.55f, 0.20f); // Color for the first sphere
+    for (Face& f : sphere1.faces) {
+        Vertex& v1 = sphere1.vertices[f.index1];
+        Vertex& v2 = sphere1.vertices[f.index2];
+        Vertex& v3 = sphere1.vertices[f.index3];
+        glVertex3f(sphere1.c.x + v1.x + 0.7f, v1.y, v1.z);
+        glVertex3f(sphere1.c.x + v2.x + 0.7f, v2.y, v2.z);
+        glVertex3f(sphere1.c.x + v3.x + 0.7f, v3.y, v3.z);
     }
-    glEnd();
 
-    xCamView -= 0.05f;
-    yCamView -= 0.05f;
+    Model& sphere2 = models.back();
+
+    // Orbit Calculus
+    float r = (a * (1 - e * e)) / (1 + e * std::cos(theta));
+    float x = r * std::cos(theta);
+    float y = r * std::sin(theta);
+
+    sphere2.c.x = x;
+    sphere2.c.y = y;
+
+    glColor3f(0.45f, 0.86f, 1.0f); // Color for the second sphere
+    for (Face& f : sphere2.faces) {
+        Vertex& v1 = sphere2.vertices[f.index1];
+        Vertex& v2 = sphere2.vertices[f.index2];
+        Vertex& v3 = sphere2.vertices[f.index3];
+
+        float xOffset = sphere1.c.x + sphere2.c.x;
+        float yOffset = sphere2.c.y;
+        glVertex3f(v1.x + xOffset, v1.y + yOffset, v1.z);
+        glVertex3f(v2.x + xOffset, v2.y + yOffset, v2.z);
+        glVertex3f(v3.x + xOffset, v3.y + yOffset, v3.z);
+    }
+
+    theta += 0.007f;
+    if(theta > 2 * M_PI) theta -= (2 * M_PI);
+
+    glEnd();
+}
+
+void renderText(const std::string& text, float x, float y) {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(-1.0, 1.0, -1.0, 1.0); // Set up a 2D orthographic projection
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glColor3f(0.0f, 1.0f, 0.0f); // Set text color to green
+    glRasterPos2f(x, y);         // Set the position for the text
+
+    for (const char& c : text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+    }
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }

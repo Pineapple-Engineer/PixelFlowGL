@@ -26,7 +26,6 @@ set(HEADERS
 )
 
 # Find GLFW
-find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLUT REQUIRED)
 find_library(GLU_LIBRARY GLU)

@@ -1,28 +1,28 @@
 #include "../include/objreader.h"
 
-void getVertex(std::vector<Vertex>& vertices, std::stringstream& ss) {
-    // std::cout << "[INFO] Creating a new Vertex...\n";
-    float x, y, z;
-    ss >> x;
-    ss >> y;
-    ss >> z;
-    vertices.push_back(Vertex(x, y, z));
+namespace objr {
+
+void getObjVertex(std::vector<Vertex>& vertices, std::stringstream& ss) {
+    float coordX, coordY, coordZ;
+    ss >> coordX;
+    ss >> coordY;
+    ss >> coordZ;
+    vertices.push_back(Vertex(coordX, coordY, coordZ));
 }
 
-void getFace(std::list<Face>& faces, std::stringstream& ss) {
-    // std::cout << "[INFO] Creating a new Face...\n";
-    ll idx1, idx2, idx3;
-    ss >> idx1;
-    ss >> idx2;
-    ss >> idx3;
-    --idx1; --idx2; --idx3;
-    faces.push_back(Face(idx1, idx2, idx3));
+void getObjFace(std::list<Face>& faces, std::stringstream& ss) {
+    int index1, index2, index3;
+    ss >> index1;
+    ss >> index2;
+    ss >> index3;
+    --index1; --index2; --index3;
+    faces.push_back(Face(index1, index2, index3));
 }
 
 bool readObj(std::list<Model>& models) {
-    std::ifstream file("../models/Man_Mesh.obj", std::ios::in);
+    std::ifstream file("../models/Orbital.obj", std::ios::in);
     if(file.fail()) {
-        std::cout << "[ERROR] Couldn't open the file\n";
+        cout << "[ERROR] Couldn't open the file\n";
         return false;
     }
 
@@ -33,15 +33,18 @@ bool readObj(std::list<Model>& models) {
         ss >> type; // Read the first token (o, v, f)
 
         if(type == "o") {
-            // std::cout << "[INFO] Creating a new Model...\n";
             models.push_back(Model());
-        } else if(type == "v") {
-            getVertex(models.back().vertices, ss);
-        } else if(type == "f") {
-            getFace(models.back().faces, ss);
+        } 
+        else if(type == "v") {
+            getObjVertex(models.back().vertices, ss);
+        } 
+        else if(type == "f") {
+            getObjFace(models.back().faces, ss);
         }
     }
 
     file.close();
     return true;
+}
+
 }

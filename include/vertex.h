@@ -3,12 +3,10 @@
 
 class Vertex {
 public:
-    float x;
-    float y;
-    float z;
+    float x, y, z;
 
-    Vertex(float px, float py, float pz)
-        : x(px), y(py), z(pz) {}
+    Vertex(float coordX, float coordY, float coordZ)
+        : x(coordX), y(coordY), z(coordZ) {}
 };
 
 #endif

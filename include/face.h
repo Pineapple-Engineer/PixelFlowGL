@@ -1,16 +1,12 @@
 #ifndef FACE_H
 #define FACE_H
 
-using ll = unsigned long long;
-
 class Face {
 public:
-    ll idx1;
-    ll idx2;
-    ll idx3;
+    int index1, index2, index3;
 
-    Face(ll pIdx1, ll pIdx2, ll pIdx3)
-        : idx1(pIdx1), idx2(pIdx2), idx3(pIdx3) {}
+    Face(int pIndex1, int pIndex2, int pIndex3)
+        : index1(pIndex1), index2(pIndex2), index3(pIndex3) {}
 };
 
 #endif
